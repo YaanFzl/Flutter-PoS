@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/sidebar.dart';
+import '../widgets/common/status_badge.dart';
 import 'payment_selection_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -139,26 +140,9 @@ class OrderCard extends StatelessWidget {
                         color: AppColors.textLight,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withAlpha(26),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.circle, size: 8, color: Colors.blue),
-                          SizedBox(width: 8),
-                          Text(
-                            'Baru',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
+                    const StatusBadge(
+                      label: 'Baru',
+                      color: Colors.blue,
                     ),
                   ],
                 ),
