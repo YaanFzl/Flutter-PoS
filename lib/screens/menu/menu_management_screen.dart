@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import 'menu/widgets/menu_item_card.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -11,6 +12,14 @@ class MenuManagementScreen extends StatefulWidget {
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   String _selectedCategory = 'Pembuka';
   final TextEditingController _searchController = TextEditingController();
+  
+  // Sample state for menu items availability
+  final Map<String, bool> _itemAvailability = {
+    'Bruschetta': true,
+    'Spring Rolls': true,
+    'Sup Tomat': true,
+    'Salad Caesar': true,
+  };
 
   @override
   void dispose() {
@@ -118,23 +127,53 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       crossAxisSpacing: 24,
                       childAspectRatio: 1.2,
                       children: [
-                        _buildMenuItem(
+                        MenuItemCard(
                           name: 'Bruschetta',
                           description: 'Roti panggang dengan tomat, bawang putih, dan basil.',
                           price: 'Rp 85.000',
-                          isAvailable: true,
+                          isAvailable: _itemAvailability['Bruschetta'] ?? true,
+                          onEdit: () => _showAddItemDialog(context),
+                          onAvailabilityChanged: (val) {
+                            setState(() {
+                              _itemAvailability['Bruschetta'] = val;
+                            });
+                          },
                         ),
-                        _buildMenuItem(
-                          name: 'Saus Bayam',
-                          description: 'Saus krim dengan artichoke dan bayam.',
-                          price: 'Rp 100.000',
-                          isAvailable: true,
+                        MenuItemCard(
+                          name: 'Spring Rolls',
+                          description: 'Lumpia goreng dengan sayuran segar.',
+                          price: 'Rp 75.000',
+                          isAvailable: _itemAvailability['Spring Rolls'] ?? true,
+                          onEdit: () => _showAddItemDialog(context),
+                          onAvailabilityChanged: (val) {
+                            setState(() {
+                              _itemAvailability['Spring Rolls'] = val;
+                            });
+                          },
                         ),
-                        _buildMenuItem(
-                          name: 'Calamari',
-                          description: 'Cumi goreng ringan dengan saus marinara.',
-                          price: 'Rp 120.000',
-                          isAvailable: false,
+                        MenuItemCard(
+                          name: 'Sup Tomat',
+                          description: 'Sup tomat segar dengan rempah Italia.',
+                          price: 'Rp 55.000',
+                          isAvailable: _itemAvailability['Sup Tomat'] ?? true,
+                          onEdit: () => _showAddItemDialog(context),
+                          onAvailabilityChanged: (val) {
+                            setState(() {
+                              _itemAvailability['Sup Tomat'] = val;
+                            });
+                          },
+                        ),
+                        MenuItemCard(
+                          name: 'Salad Caesar',
+                          description: 'Salad klasik dengan dressing Caesar.',
+                          price: 'Rp 95.000',
+                          isAvailable: _itemAvailability['Salad Caesar'] ?? true,
+                          onEdit: () => _showAddItemDialog(context),
+                          onAvailabilityChanged: (val) {
+                            setState(() {
+                              _itemAvailability['Salad Caesar'] = val;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -186,93 +225,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     );
   }
 
-  Widget _buildMenuItem({
-    required String name,
-    required String description,
-    required String price,
-    required bool isAvailable,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6F8F6),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Opacity(
-        opacity: isAvailable ? 1.0 : 0.6,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      Text(description, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                    ],
-                  ),
-                ),
-                Text(price, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      isAvailable ? 'Tersedia' : 'Tidak Tersedia',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Switch(
-                      value: isAvailable,
-                      onChanged: (val) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(val ? 'Item tersedia' : 'Item tidak tersedia'),
-                            backgroundColor: const Color(0xFF13EC5B),
-                            behavior: SnackBarBehavior.floating,
-                            duration: const Duration(seconds: 1),
-                          ),
-                        );
-                      },
-                      thumbColor: WidgetStateProperty.all(isAvailable ? AppColors.primary : Colors.grey),
-                      trackColor: WidgetStateProperty.all(isAvailable ? AppColors.primary.withAlpha(77) : Colors.grey.shade300),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () {
-                    _showAddItemDialog(context);
-                  },
-                  icon: const Icon(Icons.edit, color: Colors.grey),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   void _showAddItemDialog(BuildContext context) {
     showDialog(
