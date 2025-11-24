@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens/dashboard_screen.dart';
-import 'screens/payment/payment_selection_screen.dart';
-import 'screens/payment/payment_confirmation_screen.dart';
 import 'screens/delivery/delivery_integration_screen.dart';
-import 'screens/delivery/delivery_order_details_screen.dart';
 import 'screens/menu/menu_management_screen.dart';
 import 'theme/app_colors.dart';
+import 'widgets/main_layout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,59 +39,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const PaymentSelectionScreen(),
-    const PaymentConfirmationScreen(),
     const DeliveryIntegrationScreen(),
-    const DeliveryOrderDetailsScreen(),
     const MenuManagementScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          NavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            labelType: NavigationRailLabelType.all,
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.dashboard),
-                label: Text('Dasbor'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.payment),
-                label: Text('Pilih Bayar'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.check_circle),
-                label: Text('Konfirmasi'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.delivery_dining),
-                label: Text('Pengiriman'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.receipt_long),
-                label: Text('Detail Order'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.menu_book),
-                label: Text('Menu'),
-              ),
-            ],
-          ),
-          const VerticalDivider(thickness: 1, width: 1),
-          Expanded(
-            child: _screens[_selectedIndex],
-          ),
-        ],
-      ),
+    return MainLayout(
+      selectedIndex: _selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      child: _screens[_selectedIndex],
     );
   }
 }

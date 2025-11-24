@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({super.key});
+  final int selectedIndex;
+  final Function(int) onDestinationSelected;
+
+  const Sidebar({
+    super.key,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,33 +42,29 @@ class Sidebar extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: const [
+              children: [
                 NavItem(
                   icon: Icons.grid_view,
                   label: 'Semua Pesanan',
                   count: 7,
-                  isActive: false,
+                  isActive: selectedIndex == 0,
+                  onTap: () => onDestinationSelected(0),
                 ),
-                SizedBox(height: 12),
-                NavItem(
-                  icon: Icons.notifications_active,
-                  label: 'Baru',
-                  count: 3,
-                  isActive: true,
-                ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 NavItem(
                   icon: Icons.soup_kitchen,
-                  label: 'Memasak',
+                  label: 'Dapur',
                   count: 2,
-                  isActive: false,
+                  isActive: selectedIndex == 1,
+                  onTap: () => onDestinationSelected(1),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 NavItem(
-                  icon: Icons.check_circle,
-                  label: 'Siap',
-                  count: 2,
-                  isActive: false,
+                  icon: Icons.restaurant,
+                  label: 'Menu',
+                  count: 0,
+                  isActive: selectedIndex == 2,
+                  onTap: () => onDestinationSelected(2),
                 ),
               ],
             ),
@@ -105,55 +108,62 @@ class NavItem extends StatelessWidget {
   final String label;
   final int count;
   final bool isActive;
+  final VoidCallback onTap;
 
   const NavItem({
     super.key,
     required this.icon,
     required this.label,
     required this.count,
-    this.isActive = false,
+    required this.isActive,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.primary.withAlpha(51) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: isActive ? AppColors.primary : AppColors.textLight,
-          ),
-          const SizedBox(width: 16),
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isActive ? AppColors.primary : AppColors.textLight,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isActive ? Colors.white : AppColors.textMutedLight,
             ),
-          ),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : Colors.black.withAlpha(13),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              count.toString(),
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: isActive ? AppColors.textLight : AppColors.textLight,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isActive ? Colors.white : AppColors.textMutedLight,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-        ],
+            if (count > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isActive ? Colors.white.withAlpha(51) : AppColors.primary.withAlpha(26),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  count.toString(),
+                  style: TextStyle(
+                    color: isActive ? Colors.white : AppColors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

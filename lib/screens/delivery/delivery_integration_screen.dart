@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/common/empty_state.dart';
+import 'delivery_order_details_screen.dart';
 import 'widgets/delivery_order_card.dart';
 import 'widgets/kanban_column.dart';
 
@@ -97,6 +98,14 @@ class DeliveryIntegrationScreen extends StatelessWidget {
                     showActions: true,
                     onReject: () {},
                     onAccept: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DeliveryOrderDetailsScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
                   DeliveryOrderCard(
@@ -109,6 +118,14 @@ class DeliveryIntegrationScreen extends StatelessWidget {
                     showActions: true,
                     onReject: () {},
                     onAccept: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DeliveryOrderDetailsScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -131,6 +148,14 @@ class DeliveryIntegrationScreen extends StatelessWidget {
                     primaryActionLabel: 'Tandai Siap',
                     primaryActionIcon: Icons.check_circle,
                     onPrimaryAction: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DeliveryOrderDetailsScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
                   const EmptyState(
