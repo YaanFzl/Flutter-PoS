@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/sidebar.dart';
-import '../widgets/common/status_badge.dart';
 import 'dashboard/widgets/order_card.dart';
 
 class DashboardScreen extends StatelessWidget {
