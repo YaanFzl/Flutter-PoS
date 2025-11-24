@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/payment_selection_screen.dart';
-import 'screens/payment_confirmation_screen.dart';
-import 'screens/delivery_integration_screen.dart';
-import 'screens/delivery_order_details_screen.dart';
-import 'screens/menu_management_screen.dart';
+import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/payment/payment_selection_screen.dart';
+import 'screens/payment/payment_confirmation_screen.dart';
+import 'screens/delivery/delivery_integration_screen.dart';
+import 'screens/delivery/delivery_order_details_screen.dart';
+import 'screens/menu/menu_management_screen.dart';
 import 'theme/app_colors.dart';
 
 void main() {
