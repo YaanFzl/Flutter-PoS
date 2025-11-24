@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import 'menu/widgets/menu_item_card.dart';
+import '../../theme/app_colors.dart';
+import 'widgets/menu_item_card.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});

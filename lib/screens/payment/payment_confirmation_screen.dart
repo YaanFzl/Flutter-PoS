@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import 'delivery_order_details_screen.dart';
+import '../../theme/app_colors.dart';
+import '../delivery/delivery_order_details_screen.dart';
+import 'widgets/order_summary_card.dart';
 
 class PaymentConfirmationScreen extends StatelessWidget {
   const PaymentConfirmationScreen({super.key});
@@ -58,64 +59,12 @@ class PaymentConfirmationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 // Info Card
-                Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(maxWidth: 448), // max-w-md
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.black12),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Rp 542.500',
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textLight,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Details
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            'ID Pesanan',
-                            style: TextStyle(color: AppColors.textMutedLight),
-                          ),
-                          Text(
-                            '#12045',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(height: 1),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            'Metode Pembayaran',
-                            style: TextStyle(color: AppColors.textMutedLight),
-                          ),
-                          Text(
-                            'Visa **** 4421',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                const OrderSummaryCard(
+                  amount: 'Rp 542.500',
+                  orderId: '#12045',
+                  date: '24 Okt 2023, 14:30',
+                  paymentMethod: 'QRIS',
+                  status: 'Lunas',
                 ),
                 const SizedBox(height: 16),
                 // Link

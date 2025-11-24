@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'screens/payment/payment_selection_screen.dart';
 import 'screens/payment/payment_confirmation_screen.dart';
 import 'screens/delivery/delivery_integration_screen.dart';

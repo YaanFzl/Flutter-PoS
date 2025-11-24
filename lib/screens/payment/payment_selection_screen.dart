@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
 import 'payment_confirmation_screen.dart';
+import 'widgets/payment_method_card.dart';
 
 class PaymentSelectionScreen extends StatefulWidget {
   const PaymentSelectionScreen({super.key});
@@ -93,9 +94,6 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                         const SizedBox(height: 20),
                         
                         // RadioList
-                        // Using a GridView inside a Column needs shrinkWrap or fixed height, 
-                        // but here we have a small number of items, so a Column of Rows or Wrap is fine.
-                        // The design uses grid-cols-1 md:grid-cols-2.
                         LayoutBuilder(
                           builder: (context, constraints) {
                             // Simple responsive check
@@ -108,11 +106,37 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                               crossAxisSpacing: 16,
                               childAspectRatio: 3.5, // Adjust aspect ratio for cards
                               children: [
-                                _buildPaymentOption('QRIS', Icons.qr_code_2),
-                                _buildPaymentOption('Tunai', Icons.payments),
-                                _buildPaymentOption('Kartu Kredit/Debit', Icons.credit_card),
-                                _buildPaymentOption('E-Wallet', Icons.account_balance_wallet),
-                                _buildPaymentOption('Transfer Bank', Icons.account_balance, isFullWidth: true),
+                                PaymentMethodCard(
+                                  label: 'QRIS',
+                                  icon: Icons.qr_code_2,
+                                  isSelected: _selectedMethod == 'QRIS',
+                                  onTap: () => setState(() => _selectedMethod = 'QRIS'),
+                                ),
+                                PaymentMethodCard(
+                                  label: 'Tunai',
+                                  icon: Icons.payments,
+                                  isSelected: _selectedMethod == 'Tunai',
+                                  onTap: () => setState(() => _selectedMethod = 'Tunai'),
+                                ),
+                                PaymentMethodCard(
+                                  label: 'Kartu Kredit/Debit',
+                                  icon: Icons.credit_card,
+                                  isSelected: _selectedMethod == 'Kartu Kredit/Debit',
+                                  onTap: () => setState(() => _selectedMethod = 'Kartu Kredit/Debit'),
+                                ),
+                                PaymentMethodCard(
+                                  label: 'E-Wallet',
+                                  icon: Icons.account_balance_wallet,
+                                  isSelected: _selectedMethod == 'E-Wallet',
+                                  onTap: () => setState(() => _selectedMethod = 'E-Wallet'),
+                                ),
+                                PaymentMethodCard(
+                                  label: 'Transfer Bank',
+                                  icon: Icons.account_balance,
+                                  isSelected: _selectedMethod == 'Transfer Bank',
+                                  onTap: () => setState(() => _selectedMethod = 'Transfer Bank'),
+                                  isFullWidth: true,
+                                ),
                               ],
                             );
                           },
@@ -175,79 +199,6 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentOption(String label, IconData icon, {bool isFullWidth = false}) {
-    final isSelected = _selectedMethod == label;
-    
-    // Note: GridView children must have consistent size logic if using childAspectRatio.
-    // Making one item span 2 columns in a standard GridView is tricky without StaggeredGridView.
-    // For simplicity in this "efficient" pass, I'll ignore the "col-span-2" for Bank Transfer 
-    // or just let it be same size. The design had it span 2.
-    // To strictly follow design, I might need a Wrap or custom Layout.
-    // Let's stick to GridView for now, and if Bank Transfer needs to be wide, 
-    // I'll just let it be half-width or change layout strategy if user complains.
-    // Actually, let's use a Wrap or Column/Row combination if we really want that span,
-    // but standard GridView is easiest. I'll stick to GridView for speed/efficiency.
-    
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedMethod = label;
-        });
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withAlpha(26) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? AppColors.primary : const Color(0xFFCFE7D7),
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.textLight),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textLight,
-                ),
-              ),
-            ),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : const Color(0xFFCFE7D7),
-                  width: 2,
-                ),
-              ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    )
-                  : null,
             ),
           ],
         ),

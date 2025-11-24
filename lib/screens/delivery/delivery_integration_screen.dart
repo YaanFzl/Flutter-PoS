@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import '../../widgets/common/empty_state.dart';
+import 'widgets/delivery_order_card.dart';
+import 'widgets/kanban_column.dart';
 
 class DeliveryIntegrationScreen extends StatelessWidget {
   const DeliveryIntegrationScreen({super.key});
@@ -80,29 +82,33 @@ class DeliveryIntegrationScreen extends StatelessWidget {
           children: [
             // Column: New Orders
             Expanded(
-              child: _buildKanbanColumn(
+              child: KanbanColumn(
                 title: 'Pesanan Baru',
                 color: const Color(0xFFFF9500), // status-new
                 count: 3,
                 children: [
-                  _buildOrderCard(
+                  DeliveryOrderCard(
                     orderId: '#GF-12345',
                     platform: 'GoFood',
                     timeAgo: '5 menit lalu',
                     status: 'BARU',
                     statusColor: const Color(0xFFFF9500),
-                    items: ['2x Burger Klasik', '1x Kentang Besar', '1x Coke'],
+                    items: const ['2x Burger Klasik', '1x Kentang Besar', '1x Coke'],
                     showActions: true,
+                    onReject: () {},
+                    onAccept: () {},
                   ),
                   const SizedBox(height: 16),
-                  _buildOrderCard(
+                  DeliveryOrderCard(
                     orderId: '#GR-67890',
                     platform: 'GrabFood',
                     timeAgo: '2 menit lalu',
                     status: 'BARU',
                     statusColor: const Color(0xFFFF9500),
-                    items: ['1x Wrap Sayur', '1x Salad, 1x Air Mineral'],
+                    items: const ['1x Wrap Sayur', '1x Salad, 1x Air Mineral'],
                     showActions: true,
+                    onReject: () {},
+                    onAccept: () {},
                   ),
                 ],
               ),
@@ -110,23 +116,24 @@ class DeliveryIntegrationScreen extends StatelessWidget {
             const SizedBox(width: 24),
             // Column: Preparing
             Expanded(
-              child: _buildKanbanColumn(
+              child: KanbanColumn(
                 title: 'Sedang Dimasak',
                 color: const Color(0xFF4A90E2), // status-preparing
                 count: 1,
                 children: [
-                  _buildOrderCard(
+                  DeliveryOrderCard(
                     orderId: '#FP-55443',
                     platform: 'FoodPanda',
                     timeAgo: 'Diterima 8 menit lalu',
                     status: 'MEMASAK',
                     statusColor: const Color(0xFF4A90E2),
-                    items: ['1x Pizza Ayam Pedas', '2x Roti Bawang'],
+                    items: const ['1x Pizza Ayam Pedas', '2x Roti Bawang'],
                     primaryActionLabel: 'Tandai Siap',
                     primaryActionIcon: Icons.check_circle,
+                    onPrimaryAction: () {},
                   ),
                   const SizedBox(height: 16),
-                  _buildEmptyState(
+                  const EmptyState(
                     icon: Icons.ramen_dining,
                     message: 'Tidak ada pesanan lain yang dimasak.',
                     subMessage: 'Pesanan baru yang diterima akan muncul di sini.',
@@ -137,25 +144,26 @@ class DeliveryIntegrationScreen extends StatelessWidget {
             const SizedBox(width: 24),
             // Column: Ready for Pickup
             Expanded(
-              child: _buildKanbanColumn(
+              child: KanbanColumn(
                 title: 'Siap Diambil',
                 color: const Color(0xFF34C759), // status-ready
                 count: 1,
                 children: [
-                  _buildOrderCard(
+                  DeliveryOrderCard(
                     orderId: '#GR-11221',
                     platform: 'GrabFood',
                     timeAgo: 'Siap sejak 3 menit',
                     status: 'SIAP',
                     statusColor: const Color(0xFF34C759),
-                    items: ['3x Piring Sushi'],
+                    items: const ['3x Piring Sushi'],
                     primaryActionLabel: 'Pesanan Diambil',
                     primaryActionIcon: Icons.local_shipping,
                     primaryActionColor: Colors.grey.shade200,
                     primaryActionTextColor: Colors.black87,
+                    onPrimaryAction: () {},
                   ),
                   const SizedBox(height: 16),
-                  _buildEmptyState(
+                  const EmptyState(
                     icon: Icons.restaurant,
                     message: 'Semua selesai!',
                     subMessage: 'Tidak ada pesanan yang menunggu diambil.',
@@ -186,254 +194,5 @@ class DeliveryIntegrationScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildKanbanColumn({
-    required String title,
-    required Color color,
-    required int count,
-    required List<Widget> children,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: color.withAlpha(51),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      count.toString(),
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: children,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOrderCard({
-    required String orderId,
-    required String platform,
-    required String timeAgo,
-    required String status,
-    required Color statusColor,
-    required List<String> items,
-    bool showActions = false,
-    String? primaryActionLabel,
-    IconData? primaryActionIcon,
-    Color? primaryActionColor,
-    Color? primaryActionTextColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(13),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  // Placeholder for logo
-                  Container(
-                    width: 24,
-                    height: 24,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.image, size: 16),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        orderId,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        timeAgo,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withAlpha(51),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const SizedBox(height: 8), // Spacing instead of divider
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    color: Colors.grey.shade700,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              )),
-          if (showActions) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      foregroundColor: Colors.black87,
-                      elevation: 0,
-                    ),
-                    child: const Text('Tolak'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                    ),
-                    child: const Text('Terima'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-          if (primaryActionLabel != null) ...[
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: Icon(primaryActionIcon),
-                label: Text(primaryActionLabel),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryActionColor ?? const Color(0xFF2E7D32),
-                  foregroundColor: primaryActionTextColor ?? Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState({
-    required IconData icon,
-    required String message,
-    required String subMessage,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black12, style: BorderStyle.solid), // Dashed hard in Flutter without package
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subMessage,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
+

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'widgets/customer_info_card.dart';
+import 'widgets/delivery_summary_card.dart';
+import 'widgets/order_items_card.dart';
+import 'widgets/special_requests_card.dart';
 
 class DeliveryOrderDetailsScreen extends StatelessWidget {
   const DeliveryOrderDetailsScreen({super.key});
@@ -56,123 +60,40 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       // Order Items Card
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Item Pesanan',
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 24),
-                            _buildOrderItem(
-                              name: '2x Ramen Pedas',
-                              price: 'Rp 240.000',
-                              details: 'Tambah cabai, Tanpa telur',
-                            ),
-                            const Divider(height: 32),
-                            _buildOrderItem(
-                              name: '1x Gyoza (6 pcs)',
-                              price: 'Rp 80.000',
-                            ),
-                            const Divider(height: 32),
-                            _buildOrderItem(
-                              name: '1x Teh Hijau',
-                              price: 'Rp 30.000',
-                            ),
-                          ],
-                        ),
+                      const OrderItemsCard(
+                        items: [
+                          {'name': '2x Ramen Pedas', 'price': 'Rp 240.000', 'details': 'Tambah cabai, Tanpa telur'},
+                          {'name': '1x Gyoza (6 pcs)', 'price': 'Rp 80.000'},
+                          {'name': '1x Teh Hijau', 'price': 'Rp 30.000'},
+                        ],
                       ),
                       const SizedBox(height: 24),
                       // Customer & Special Requests
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: const [
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.black12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Pelanggan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 16),
-                                  _buildIconText(Icons.person, 'Jane Doe'),
-                                  const SizedBox(height: 12),
-                                  _buildIconText(Icons.phone, '+1 (555) 123-4567'),
-                                  const SizedBox(height: 12),
-                                  _buildIconText(Icons.home, '123 Maple Street, Apt 4B,\nSpringfield, SP 67890'),
-                                ],
-                              ),
+                            child: CustomerInfoCard(
+                              name: 'Jane Doe',
+                              phone: '+1 (555) 123-4567',
+                              address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
                             ),
                           ),
-                          const SizedBox(width: 24),
+                          SizedBox(width: 24),
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.black12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Permintaan Khusus', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 16),
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFEC107).withAlpha(26), // accent-yellow-bg
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Text(
-                                      '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
-                                      style: TextStyle(color: Color(0xFFB38600)), // darker yellow
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            child: SpecialRequestsCard(
+                              request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
                       // Totals Card
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Column(
-                          children: [
-                            _buildTotalRow('Subtotal', 'Rp 350.000'),
-                            const SizedBox(height: 8),
-                            _buildTotalRow('Pajak & Biaya', 'Rp 45.000'),
-                            const SizedBox(height: 8),
-                            _buildTotalRow('Biaya Pengiriman', 'Rp 50.000'),
-                            const Divider(height: 32),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text('Total Keseluruhan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                Text('Rp 445.000', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ],
-                        ),
+                      const DeliverySummaryCard(
+                        subtotal: 'Rp 350.000',
+                        tax: 'Rp 45.000',
+                        deliveryFee: 'Rp 50.000',
+                        total: 'Rp 445.000',
                       ),
                     ],
                   ),
@@ -377,56 +298,6 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildOrderItem({required String name, required String price, String? details}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 70,
-          height: 70,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.fastfood, color: Colors.grey),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-              Text(price, style: const TextStyle(color: Color(0xFF4C9A66), fontSize: 16)),
-              if (details != null)
-                Text(details, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIconText(IconData icon, String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: Colors.grey.shade600),
-        const SizedBox(width: 12),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 16))),
-      ],
-    );
-  }
-
-  Widget _buildTotalRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 16)),
-        Text(value, style: const TextStyle(fontSize: 16)),
-      ],
     );
   }
 }
