@@ -109,7 +109,14 @@ class MenuItemCard extends StatelessWidget {
                           ),
                         );
                       },
-                      activeColor: AppColors.primary,
+                      thumbColor: WidgetStateProperty.all(
+                        isAvailable ? AppColors.primary : Colors.grey,
+                      ),
+                      trackColor: WidgetStateProperty.all(
+                        isAvailable
+                            ? AppColors.primary.withAlpha(77)
+                            : Colors.grey.shade300,
+                      ),
                     ),
                   ],
                 ),
