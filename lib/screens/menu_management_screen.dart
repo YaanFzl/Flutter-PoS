@@ -10,11 +10,18 @@ class MenuManagementScreen extends StatefulWidget {
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   String _selectedCategory = 'Pembuka';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8F6), // background-light
+      backgroundColor: const Color(0xFFF6F8F6),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF6F8F6),
         elevation: 0,
@@ -47,9 +54,8 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       ),
       body: Row(
         children: [
-          // Left Column: Categories
           Container(
-            width: 300, // w-1/4 approx
+            width: 300,
             decoration: const BoxDecoration(
               color: Color(0xFFF6F8F6),
               border: Border(right: BorderSide(color: Colors.black12)),
@@ -70,14 +76,12 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               ],
             ),
           ),
-          // Right Column: Menu Items
           Expanded(
             child: Container(
               color: Colors.grey.shade50,
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  // Search Bar
                   Container(
                     height: 56,
                     decoration: BoxDecoration(
@@ -93,20 +97,23 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         ),
                         Expanded(
                           child: TextField(
+                            controller: _searchController,
                             decoration: const InputDecoration(
                               hintText: 'Cari pembuka...',
                               border: InputBorder.none,
                             ),
+                            onChanged: (value) {
+                              setState(() {});
+                            },
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Grid
                   Expanded(
                     child: GridView.count(
-                      crossAxisCount: 3, // xl:grid-cols-3
+                      crossAxisCount: 3,
                       mainAxisSpacing: 24,
                       crossAxisSpacing: 24,
                       childAspectRatio: 1.2,
@@ -238,14 +245,25 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                     const SizedBox(width: 8),
                     Switch(
                       value: isAvailable,
-                      onChanged: (val) {},
+                      onChanged: (val) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(val ? 'Item tersedia' : 'Item tidak tersedia'),
+                            backgroundColor: const Color(0xFF13EC5B),
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      },
                       thumbColor: WidgetStateProperty.all(isAvailable ? AppColors.primary : Colors.grey),
                       trackColor: WidgetStateProperty.all(isAvailable ? AppColors.primary.withAlpha(77) : Colors.grey.shade300),
                     ),
                   ],
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showAddItemDialog(context);
+                  },
                   icon: const Icon(Icons.edit, color: Colors.grey),
                 ),
               ],
@@ -259,10 +277,10 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   void _showAddItemDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Container(
-          width: 672, // max-w-2xl
+          width: 672,
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -334,18 +352,26 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(dialogContext),
                     child: const Text('Batal'),
                   ),
                   const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.save),
-                    label: const Text('Simpan'),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Item berhasil disimpan'),
+                          backgroundColor: Color(0xFF13EC5B),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                     ),
+                    child: const Text('Simpan'),
                   ),
                 ],
               ),
