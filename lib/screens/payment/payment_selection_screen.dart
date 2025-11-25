@@ -52,99 +52,107 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
             ),
             
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 672), // max-w-2xl
-                    child: Column(
-                      children: [
-                        // HeadlineText
-                        const Text(
-                          'Total yang Harus Dibayar',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textLight,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Rp 550.000',
-                          style: TextStyle(
-                            fontSize: 56,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        
-                        // TitleText
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Pilih Metode Pembayaran',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textLight,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        
-                        // RadioList
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            // Simple responsive check
-                            bool isWide = constraints.maxWidth > 600;
-                            return GridView.count(
-                              crossAxisCount: isWide ? 2 : 1,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3.5, // Adjust aspect ratio for cards
-                              children: [
-                                PaymentMethodCard(
-                                  label: 'QRIS',
-                                  icon: Icons.qr_code_2,
-                                  isSelected: _selectedMethod == 'QRIS',
-                                  onTap: () => setState(() => _selectedMethod = 'QRIS'),
-                                ),
-                                PaymentMethodCard(
-                                  label: 'Tunai',
-                                  icon: Icons.payments,
-                                  isSelected: _selectedMethod == 'Tunai',
-                                  onTap: () => setState(() => _selectedMethod = 'Tunai'),
-                                ),
-                                PaymentMethodCard(
-                                  label: 'Kartu Kredit/Debit',
-                                  icon: Icons.credit_card,
-                                  isSelected: _selectedMethod == 'Kartu Kredit/Debit',
-                                  onTap: () => setState(() => _selectedMethod = 'Kartu Kredit/Debit'),
-                                ),
-                                PaymentMethodCard(
-                                  label: 'E-Wallet',
-                                  icon: Icons.account_balance_wallet,
-                                  isSelected: _selectedMethod == 'E-Wallet',
-                                  onTap: () => setState(() => _selectedMethod = 'E-Wallet'),
-                                ),
-                                PaymentMethodCard(
-                                  label: 'Transfer Bank',
-                                  icon: Icons.account_balance,
-                                  isSelected: _selectedMethod == 'Transfer Bank',
-                                  onTap: () => setState(() => _selectedMethod = 'Transfer Bank'),
-                                  isFullWidth: true,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 600;
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 16 : 24,
+                      vertical: isMobile ? 16 : 32,
                     ),
-                  ),
-                ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 672), // max-w-2xl
+                        child: Column(
+                          children: [
+                            // HeadlineText
+                            const Text(
+                              'Total yang Harus Dibayar',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textLight,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Rp 550.000',
+                              style: TextStyle(
+                                fontSize: 56,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            
+                            // TitleText
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Pilih Metode Pembayaran',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textLight,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            
+                            // RadioList
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Simple responsive check
+                                bool isWide = constraints.maxWidth > 600;
+                                return GridView.count(
+                                  crossAxisCount: isWide ? 2 : 1,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  mainAxisSpacing: 16,
+                                  crossAxisSpacing: 16,
+                                  childAspectRatio: 3.5, // Adjust aspect ratio for cards
+                                  children: [
+                                    PaymentMethodCard(
+                                      label: 'QRIS',
+                                      icon: Icons.qr_code_2,
+                                      isSelected: _selectedMethod == 'QRIS',
+                                      onTap: () => setState(() => _selectedMethod = 'QRIS'),
+                                    ),
+                                    PaymentMethodCard(
+                                      label: 'Tunai',
+                                      icon: Icons.payments,
+                                      isSelected: _selectedMethod == 'Tunai',
+                                      onTap: () => setState(() => _selectedMethod = 'Tunai'),
+                                    ),
+                                    PaymentMethodCard(
+                                      label: 'Kartu Kredit/Debit',
+                                      icon: Icons.credit_card,
+                                      isSelected: _selectedMethod == 'Kartu Kredit/Debit',
+                                      onTap: () => setState(() => _selectedMethod = 'Kartu Kredit/Debit'),
+                                    ),
+                                    PaymentMethodCard(
+                                      label: 'E-Wallet',
+                                      icon: Icons.account_balance_wallet,
+                                      isSelected: _selectedMethod == 'E-Wallet',
+                                      onTap: () => setState(() => _selectedMethod = 'E-Wallet'),
+                                    ),
+                                    PaymentMethodCard(
+                                      label: 'Transfer Bank',
+                                      icon: Icons.account_balance,
+                                      isSelected: _selectedMethod == 'Transfer Bank',
+                                      onTap: () => setState(() => _selectedMethod = 'Transfer Bank'),
+                                      isFullWidth: true,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             

@@ -89,16 +89,17 @@ class PaymentConfirmationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 // Buttons
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 448),
-                  child: Column(
-                    children: [
-                      Row(
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 400; // Small breakpoint for buttons
+                    
+                    if (isMobile) {
+                      return Column(
                         children: [
-                          Expanded(
+                          SizedBox(
+                            width: double.infinity,
                             child: OutlinedButton.icon(
                               onPressed: () {
-                                // Send receipt via email
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Struk telah dikirim via email'),
@@ -119,11 +120,11 @@ class PaymentConfirmationScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
                             child: OutlinedButton.icon(
                               onPressed: () {
-                                // Print receipt
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Struk sedang dicetak...'),
@@ -145,7 +146,62 @@ class PaymentConfirmationScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Struk telah dikirim via email'),
+                                  backgroundColor: Color(0xFF13EC5B),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.email_outlined),
+                            label: const Text('Kirim Struk'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.textLight,
+                              side: const BorderSide(color: Colors.black12),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Struk sedang dicetak...'),
+                                  backgroundColor: Color(0xFF13EC5B),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.print_outlined),
+                            label: const Text('Cetak Struk'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.textLight,
+                              side: const BorderSide(color: Colors.black12),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
@@ -172,9 +228,7 @@ class PaymentConfirmationScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
+
               ],
             ),
           ),

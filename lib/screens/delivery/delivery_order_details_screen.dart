@@ -51,249 +51,519 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1536), // max-w-screen-2xl
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left Column: Order Details (3/5 width)
-                Expanded(
-                  flex: 3,
-                  child: Column(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.maxWidth < 1000; // Breakpoint for 2-column layout
+
+                if (isMobile) {
+                  return Column(
                     children: [
-                      // Order Items Card
-                      const OrderItemsCard(
-                        items: [
-                          {'name': '2x Ramen Pedas', 'price': 'Rp 240.000', 'details': 'Tambah cabai, Tanpa telur'},
-                          {'name': '1x Gyoza (6 pcs)', 'price': 'Rp 80.000'},
-                          {'name': '1x Teh Hijau', 'price': 'Rp 30.000'},
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Customer & Special Requests
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Expanded(
-                            child: CustomerInfoCard(
-                              name: 'Jane Doe',
-                              phone: '+1 (555) 123-4567',
-                              address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
-                            ),
+                      // Order Details Section
+                      Column(
+                        children: [
+                          // Order Items Card
+                          const OrderItemsCard(
+                            items: [
+                              {'name': '2x Ramen Pedas', 'price': 'Rp 240.000', 'details': 'Tambah cabai, Tanpa telur'},
+                              {'name': '1x Gyoza (6 pcs)', 'price': 'Rp 80.000'},
+                              {'name': '1x Teh Hijau', 'price': 'Rp 30.000'},
+                            ],
                           ),
-                          SizedBox(width: 24),
-                          Expanded(
-                            child: SpecialRequestsCard(
-                              request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Totals Card
-                      const DeliverySummaryCard(
-                        subtotal: 'Rp 350.000',
-                        tax: 'Rp 45.000',
-                        deliveryFee: 'Rp 50.000',
-                        total: 'Rp 445.000',
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 24),
-                // Right Column: Status & Actions (2/5 width)
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    children: [
-                      // Status Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Column(
-                          children: [
-                            const Text('STATUS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF28A745).withAlpha(26),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(color: Color(0xFF28A745), shape: BoxShape.circle),
+                          const SizedBox(height: 24),
+                          // Customer & Special Requests
+                          // On mobile, these might also need to stack if width is very small, 
+                          // but let's keep them side-by-side or wrap them.
+                          // For simplicity, let's stack them on very small screens or keep row if space permits.
+                          // Let's use a Wrap or Column for safety on mobile.
+                          LayoutBuilder(
+                            builder: (context, innerConstraints) {
+                              if (innerConstraints.maxWidth < 600) {
+                                return Column(
+                                  children: const [
+                                    CustomerInfoCard(
+                                      name: 'Jane Doe',
+                                      phone: '+1 (555) 123-4567',
+                                      address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
+                                    ),
+                                    SizedBox(height: 24),
+                                    SpecialRequestsCard(
+                                      request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
+                                    ),
+                                  ],
+                                );
+                              }
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Expanded(
+                                    child: CustomerInfoCard(
+                                      name: 'Jane Doe',
+                                      phone: '+1 (555) 123-4567',
+                                      address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
+                                    ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Text('Pesanan Baru', style: TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold)),
+                                  SizedBox(width: 24),
+                                  Expanded(
+                                    child: SpecialRequestsCard(
+                                      request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
+                                    ),
+                                  ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          // Totals Card
+                          const DeliverySummaryCard(
+                            subtotal: 'Rp 350.000',
+                            tax: 'Rp 45.000',
+                            deliveryFee: 'Rp 50.000',
+                            total: 'Rp 445.000',
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 24),
-                      // Timer Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Column(
-                          children: const [
-                            Text('ESTIMASI PENGAMBILAN DALAM', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-                            SizedBox(height: 8),
-                            Text('15:00', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Color(0xFF4C9A66))), // primary
-                            SizedBox(height: 4),
-                            Text('Dipesan 2 menit lalu', style: TextStyle(color: Colors.grey)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Actions Card
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Pesanan dikonfirmasi, mulai memasak'),
-                                      backgroundColor: Color(0xFF13EC5B),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.check),
-                                label: const Text('Konfirmasi & Mulai Memasak'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4C9A66),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                      // Status & Actions Section
+                      Column(
+                        children: [
+                          // Status Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
                             ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Pesanan siap diambil'),
-                                      backgroundColor: Color(0xFF13EC5B),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.local_shipping),
-                                label: const Text('Siap Diambil'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4C9A66).withAlpha(51),
-                                  foregroundColor: const Color(0xFF4C9A66),
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
+                                const Text('STATUS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF28A745).withAlpha(26),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(color: Color(0xFF28A745), shape: BoxShape.circle),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text('Pesanan Baru', style: TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Timer Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
+                            ),
+                            child: Column(
+                              children: const [
+                                Text('ESTIMASI PENGAMBILAN DALAM', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                                SizedBox(height: 8),
+                                Text('15:00', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Color(0xFF4C9A66))), // primary
+                                SizedBox(height: 4),
+                                Text('Dipesan 2 menit lalu', style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Actions Card
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
                                     onPressed: () {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                          content: Text('Pesanan sedang dicetak...'),
+                                          content: Text('Pesanan dikonfirmasi, mulai memasak'),
                                           backgroundColor: Color(0xFF13EC5B),
                                           behavior: SnackBarBehavior.floating,
                                         ),
                                       );
                                     },
-                                    icon: const Icon(Icons.print),
-                                    label: const Text('Cetak'),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.grey.shade700,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                    icon: const Icon(Icons.check),
+                                    label: const Text('Konfirmasi & Mulai Memasak'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4C9A66),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: OutlinedButton.icon(
+                                const SizedBox(height: 16),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
                                     onPressed: () {
-                                      final controller = TextEditingController();
-                                      showDialog(
-                                        context: context,
-                                        builder: (dialogContext) => AlertDialog(
-                                          title: const Text('Laporkan Masalah'),
-                                          content: TextField(
-                                            controller: controller,
-                                            decoration: const InputDecoration(
-                                              hintText: 'Jelaskan masalah yang terjadi...',
-                                              border: OutlineInputBorder(),
-                                            ),
-                                            maxLines: 4,
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(dialogContext),
-                                              child: const Text('Batal'),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.pop(dialogContext);
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Laporan telah dikirim'),
-                                                    backgroundColor: Color(0xFF13EC5B),
-                                                    behavior: SnackBarBehavior.floating,
-                                                  ),
-                                                );
-                                              },
-                                              child: const Text('Kirim'),
-                                            ),
-                                          ],
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Pesanan siap diambil'),
+                                          backgroundColor: Color(0xFF13EC5B),
+                                          behavior: SnackBarBehavior.floating,
                                         ),
                                       );
                                     },
-                                    icon: const Icon(Icons.report),
-                                    label: const Text('Masalah'),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.grey.shade700,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                    icon: const Icon(Icons.local_shipping),
+                                    label: const Text('Siap Diambil'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4C9A66).withAlpha(51),
+                                      foregroundColor: const Color(0xFF4C9A66),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                     ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Pesanan sedang dicetak...'),
+                                              backgroundColor: Color(0xFF13EC5B),
+                                              behavior: SnackBarBehavior.floating,
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.print),
+                                        label: const Text('Cetak'),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.grey.shade700,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          final controller = TextEditingController();
+                                          showDialog(
+                                            context: context,
+                                            builder: (dialogContext) => AlertDialog(
+                                              title: const Text('Laporkan Masalah'),
+                                              content: TextField(
+                                                controller: controller,
+                                                decoration: const InputDecoration(
+                                                  hintText: 'Jelaskan masalah yang terjadi...',
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                                maxLines: 4,
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(dialogContext),
+                                                  child: const Text('Batal'),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(dialogContext);
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('Laporan telah dikirim'),
+                                                        backgroundColor: Color(0xFF13EC5B),
+                                                        behavior: SnackBarBehavior.floating,
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: const Text('Kirim'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.report),
+                                        label: const Text('Masalah'),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.grey.shade700,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+
+                // Desktop/Tablet Layout (Row)
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column: Order Details (3/5 width)
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          // Order Items Card
+                          const OrderItemsCard(
+                            items: [
+                              {'name': '2x Ramen Pedas', 'price': 'Rp 240.000', 'details': 'Tambah cabai, Tanpa telur'},
+                              {'name': '1x Gyoza (6 pcs)', 'price': 'Rp 80.000'},
+                              {'name': '1x Teh Hijau', 'price': 'Rp 30.000'},
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          // Customer & Special Requests
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Expanded(
+                                child: CustomerInfoCard(
+                                  name: 'Jane Doe',
+                                  phone: '+1 (555) 123-4567',
+                                  address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
+                                ),
+                              ),
+                              SizedBox(width: 24),
+                              Expanded(
+                                child: SpecialRequestsCard(
+                                  request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          // Totals Card
+                          const DeliverySummaryCard(
+                            subtotal: 'Rp 350.000',
+                            tax: 'Rp 45.000',
+                            deliveryFee: 'Rp 50.000',
+                            total: 'Rp 445.000',
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    // Right Column: Status & Actions (2/5 width)
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        children: [
+                          // Status Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
+                            ),
+                            child: Column(
+                              children: [
+                                const Text('STATUS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF28A745).withAlpha(26),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(color: Color(0xFF28A745), shape: BoxShape.circle),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text('Pesanan Baru', style: TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold)),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Timer Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
+                            ),
+                            child: Column(
+                              children: const [
+                                Text('ESTIMASI PENGAMBILAN DALAM', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                                SizedBox(height: 8),
+                                Text('15:00', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Color(0xFF4C9A66))), // primary
+                                SizedBox(height: 4),
+                                Text('Dipesan 2 menit lalu', style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Actions Card
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black12),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Pesanan dikonfirmasi, mulai memasak'),
+                                          backgroundColor: Color(0xFF13EC5B),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.check),
+                                    label: const Text('Konfirmasi & Mulai Memasak'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4C9A66),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Pesanan siap diambil'),
+                                          backgroundColor: Color(0xFF13EC5B),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.local_shipping),
+                                    label: const Text('Siap Diambil'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4C9A66).withAlpha(51),
+                                      foregroundColor: const Color(0xFF4C9A66),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Pesanan sedang dicetak...'),
+                                              backgroundColor: Color(0xFF13EC5B),
+                                              behavior: SnackBarBehavior.floating,
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.print),
+                                        label: const Text('Cetak'),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.grey.shade700,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          final controller = TextEditingController();
+                                          showDialog(
+                                            context: context,
+                                            builder: (dialogContext) => AlertDialog(
+                                              title: const Text('Laporkan Masalah'),
+                                              content: TextField(
+                                                controller: controller,
+                                                decoration: const InputDecoration(
+                                                  hintText: 'Jelaskan masalah yang terjadi...',
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                                maxLines: 4,
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(dialogContext),
+                                                  child: const Text('Batal'),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(dialogContext);
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('Laporan telah dikirim'),
+                                                        backgroundColor: Color(0xFF13EC5B),
+                                                        behavior: SnackBarBehavior.floating,
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: const Text('Kirim'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.report),
+                                        label: const Text('Masalah'),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.grey.shade700,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),

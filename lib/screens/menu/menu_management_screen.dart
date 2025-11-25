@@ -61,128 +61,240 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           ),
         ],
       ),
-      body: Row(
-        children: [
-          Container(
-            width: 300,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF6F8F6),
-              border: Border(right: BorderSide(color: Colors.black12)),
-            ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 900;
+          final gridCrossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1100 ? 2 : 3);
+          final gridChildAspectRatio = constraints.maxWidth < 600 ? 1.2 : 0.8;
+
+          if (isMobile) {
+            return Column(
               children: [
-                const Text(
-                  'Kategori',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                // Mobile Category Selector (Horizontal List)
+                Container(
+                  height: 60,
+                  color: Colors.white,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    children: [
+                      _buildMobileCategoryChip('Pembuka', true),
+                      const SizedBox(width: 8),
+                      _buildMobileCategoryChip('Hidangan Utama', false),
+                      const SizedBox(width: 8),
+                      _buildMobileCategoryChip('Pencuci Mulut', false),
+                      const SizedBox(width: 8),
+                      _buildMobileCategoryChip('Minuman', false),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
-                _buildCategoryItem('Pembuka', Icons.local_bar),
-                _buildCategoryItem('Hidangan Utama', Icons.restaurant_menu),
-                _buildCategoryItem('Pencuci Mulut', Icons.icecream),
-                _buildCategoryItem('Minuman', Icons.emoji_food_beverage),
+                const Divider(height: 1),
+                // Menu Grid
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: gridCrossAxisCount,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: gridChildAspectRatio,
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      MenuItemCard(
+                        name: 'Bruschetta',
+                        description: 'Roti panggang dengan tomat, bawang putih, dan basil.',
+                        price: 'Rp 85.000',
+                        isAvailable: _itemAvailability['Bruschetta'] ?? true,
+                        onEdit: () => _showAddItemDialog(context),
+                        onAvailabilityChanged: (val) {
+                          setState(() {
+                            _itemAvailability['Bruschetta'] = val;
+                          });
+                        },
+                      ),
+                      MenuItemCard(
+                        name: 'Spring Rolls',
+                        description: 'Lumpia goreng dengan sayuran segar.',
+                        price: 'Rp 75.000',
+                        isAvailable: _itemAvailability['Spring Rolls'] ?? true,
+                        onEdit: () => _showAddItemDialog(context),
+                        onAvailabilityChanged: (val) {
+                          setState(() {
+                            _itemAvailability['Spring Rolls'] = val;
+                          });
+                        },
+                      ),
+                      MenuItemCard(
+                        name: 'Sup Tomat',
+                        description: 'Sup tomat segar dengan rempah Italia.',
+                        price: 'Rp 55.000',
+                        isAvailable: _itemAvailability['Sup Tomat'] ?? true,
+                        onEdit: () => _showAddItemDialog(context),
+                        onAvailabilityChanged: (val) {
+                          setState(() {
+                            _itemAvailability['Sup Tomat'] = val;
+                          });
+                        },
+                      ),
+                      MenuItemCard(
+                        name: 'Salad Caesar',
+                        description: 'Salad klasik dengan dressing Caesar.',
+                        price: 'Rp 95.000',
+                        isAvailable: _itemAvailability['Salad Caesar'] ?? true,
+                        onEdit: () => _showAddItemDialog(context),
+                        onAvailabilityChanged: (val) {
+                          setState(() {
+                            _itemAvailability['Salad Caesar'] = val;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: Colors.grey.shade50,
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.black12),
+            );
+          }
+
+          // Desktop Layout
+          return Row(
+            children: [
+              Container(
+                width: 300,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF6F8F6),
+                  border: Border(right: BorderSide(color: Colors.black12)),
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Kategori',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Icon(Icons.search, color: Colors.grey),
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            decoration: const InputDecoration(
-                              hintText: 'Cari pembuka...',
-                              border: InputBorder.none,
-                            ),
-                            onChanged: (value) {
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: GridView.count(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 24,
-                      crossAxisSpacing: 24,
-                      childAspectRatio: 1.2,
-                      children: [
-                        MenuItemCard(
-                          name: 'Bruschetta',
-                          description: 'Roti panggang dengan tomat, bawang putih, dan basil.',
-                          price: 'Rp 85.000',
-                          isAvailable: _itemAvailability['Bruschetta'] ?? true,
-                          onEdit: () => _showAddItemDialog(context),
-                          onAvailabilityChanged: (val) {
-                            setState(() {
-                              _itemAvailability['Bruschetta'] = val;
-                            });
-                          },
-                        ),
-                        MenuItemCard(
-                          name: 'Spring Rolls',
-                          description: 'Lumpia goreng dengan sayuran segar.',
-                          price: 'Rp 75.000',
-                          isAvailable: _itemAvailability['Spring Rolls'] ?? true,
-                          onEdit: () => _showAddItemDialog(context),
-                          onAvailabilityChanged: (val) {
-                            setState(() {
-                              _itemAvailability['Spring Rolls'] = val;
-                            });
-                          },
-                        ),
-                        MenuItemCard(
-                          name: 'Sup Tomat',
-                          description: 'Sup tomat segar dengan rempah Italia.',
-                          price: 'Rp 55.000',
-                          isAvailable: _itemAvailability['Sup Tomat'] ?? true,
-                          onEdit: () => _showAddItemDialog(context),
-                          onAvailabilityChanged: (val) {
-                            setState(() {
-                              _itemAvailability['Sup Tomat'] = val;
-                            });
-                          },
-                        ),
-                        MenuItemCard(
-                          name: 'Salad Caesar',
-                          description: 'Salad klasik dengan dressing Caesar.',
-                          price: 'Rp 95.000',
-                          isAvailable: _itemAvailability['Salad Caesar'] ?? true,
-                          onEdit: () => _showAddItemDialog(context),
-                          onAvailabilityChanged: (val) {
-                            setState(() {
-                              _itemAvailability['Salad Caesar'] = val;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    _buildCategoryItem('Pembuka', Icons.local_bar),
+                    _buildCategoryItem('Hidangan Utama', Icons.restaurant_menu),
+                    _buildCategoryItem('Pencuci Mulut', Icons.icecream),
+                    _buildCategoryItem('Minuman', Icons.emoji_food_beverage),
+                  ],
+                ),
               ),
-            ),
-          ),
-        ],
+              Expanded(
+                child: Container(
+                  color: Colors.grey.shade50,
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.black12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Icon(Icons.search, color: Colors.grey),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Cari pembuka...',
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Expanded(
+                        child: GridView.count(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 24,
+                          crossAxisSpacing: 24,
+                          childAspectRatio: 1.2,
+                          children: [
+                            MenuItemCard(
+                              name: 'Bruschetta',
+                              description: 'Roti panggang dengan tomat, bawang putih, dan basil.',
+                              price: 'Rp 85.000',
+                              isAvailable: _itemAvailability['Bruschetta'] ?? true,
+                              onEdit: () => _showAddItemDialog(context),
+                              onAvailabilityChanged: (val) {
+                                setState(() {
+                                  _itemAvailability['Bruschetta'] = val;
+                                });
+                              },
+                            ),
+                            MenuItemCard(
+                              name: 'Spring Rolls',
+                              description: 'Lumpia goreng dengan sayuran segar.',
+                              price: 'Rp 75.000',
+                              isAvailable: _itemAvailability['Spring Rolls'] ?? true,
+                              onEdit: () => _showAddItemDialog(context),
+                              onAvailabilityChanged: (val) {
+                                setState(() {
+                                  _itemAvailability['Spring Rolls'] = val;
+                                });
+                              },
+                            ),
+                            MenuItemCard(
+                              name: 'Sup Tomat',
+                              description: 'Sup tomat segar dengan rempah Italia.',
+                              price: 'Rp 55.000',
+                              isAvailable: _itemAvailability['Sup Tomat'] ?? true,
+                              onEdit: () => _showAddItemDialog(context),
+                              onAvailabilityChanged: (val) {
+                                setState(() {
+                                  _itemAvailability['Sup Tomat'] = val;
+                                });
+                              },
+                            ),
+                            MenuItemCard(
+                              name: 'Salad Caesar',
+                              description: 'Salad klasik dengan dressing Caesar.',
+                              price: 'Rp 95.000',
+                              isAvailable: _itemAvailability['Salad Caesar'] ?? true,
+                              onEdit: () => _showAddItemDialog(context),
+                              onAvailabilityChanged: (val) {
+                                setState(() {
+                                  _itemAvailability['Salad Caesar'] = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMobileCategoryChip(String title, bool isSelected) {
+    return ChoiceChip(
+      label: Text(title),
+      selected: isSelected,
+      onSelected: (bool selected) {},
+      selectedColor: AppColors.primary.withAlpha(51),
+      labelStyle: TextStyle(
+        color: isSelected ? AppColors.primary : Colors.grey[700],
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      backgroundColor: Colors.white,
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : Colors.grey[300]!,
       ),
     );
   }
