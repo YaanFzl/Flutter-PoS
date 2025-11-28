@@ -5,6 +5,7 @@ import 'payment/payment_selection_screen.dart';
 import '../services/api_service.dart';
 import '../models/transaction_model.dart';
 import 'package:intl/intl.dart';
+import 'order/create_order_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -43,48 +44,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _createTestTransaction() async {
-    try {
-      await _apiService.createTransaction({
-        "id_cashier": 1,
-        "type": "makan_ditempat",
-        "table_number": 99,
-        "customer_name": "Test User",
-        "payment_method": "cash",
-        "status": "waiting_payment",
-        "items": [
-          {
-            "id_product": 1, // Assuming ID 1 exists
-            "price": 10000,
-            "quantity": 1
-          }
-        ]
-      });
-      setState(() {
-        _transactionsFuture = _apiService.getTransactions();
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Test transaction created')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create test transaction: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createTestTransaction,
-        child: const Icon(Icons.add),
-      ),
+      backgroundColor: Colors.transparent,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 600;
@@ -119,6 +82,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         );
                       },
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CreateOrderScreen()),
+                        );
+                        if (result == true) {
+                          setState(() {
+                            _transactionsFuture = _apiService.getTransactions();
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Buat Pesanan'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ],
                 ),

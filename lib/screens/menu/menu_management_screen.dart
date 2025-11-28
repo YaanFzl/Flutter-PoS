@@ -13,7 +13,6 @@ class MenuManagementScreen extends StatefulWidget {
 }
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
-  String _selectedCategory = 'Pembuka';
   final TextEditingController _searchController = TextEditingController();
   final ApiService _apiService = ApiService();
   late Future<List<Product>> _productsFuture;
@@ -44,13 +43,17 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8F6),
+      backgroundColor: Colors.transparent, // Let MainLayout background show
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF6F8F6),
+        backgroundColor: Colors.white.withAlpha(200),
         elevation: 0,
         title: const Text(
           'Manajemen Menu',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: AppColors.textLight,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
@@ -70,6 +73,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ),
@@ -79,30 +85,11 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 900;
           final gridCrossAxisCount = constraints.maxWidth < 600 ? 1 : (constraints.maxWidth < 1100 ? 2 : 3);
-          final gridChildAspectRatio = constraints.maxWidth < 600 ? 1.2 : 0.8;
+          final gridChildAspectRatio = constraints.maxWidth < 600 ? 1.0 : 0.75; // Adjusted for image card
 
           if (isMobile) {
             return Column(
               children: [
-                // Mobile Category Selector (Horizontal List)
-                Container(
-                  height: 60,
-                  color: Colors.white,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    children: [
-                      _buildMobileCategoryChip('Pembuka', true),
-                      const SizedBox(width: 8),
-                      _buildMobileCategoryChip('Hidangan Utama', false),
-                      const SizedBox(width: 8),
-                      _buildMobileCategoryChip('Pencuci Mulut', false),
-                      const SizedBox(width: 8),
-                      _buildMobileCategoryChip('Minuman', false),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
                 // Menu Grid
                 Expanded(
                   child: FutureBuilder<List<Product>>(
@@ -132,6 +119,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                             name: product.name,
                             description: product.description ?? '',
                             price: _formatCurrency(product.price),
+                            imageUrl: product.image,
                             isAvailable: product.stock > 0,
                             onEdit: () => _showAddItemDialog(context),
                             onAvailabilityChanged: (val) {
@@ -148,169 +136,93 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           }
 
           // Desktop Layout
-          return Row(
-            children: [
-              Container(
-                width: 300,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF6F8F6),
-                  border: Border(right: BorderSide(color: Colors.black12)),
-                ),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Kategori',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 24),
-                    _buildCategoryItem('Pembuka', Icons.local_bar),
-                    _buildCategoryItem('Hidangan Utama', Icons.restaurant_menu),
-                    _buildCategoryItem('Pencuci Mulut', Icons.icecream),
-                    _buildCategoryItem('Minuman', Icons.emoji_food_beverage),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  color: Colors.grey.shade50,
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: Icon(Icons.search, color: Colors.grey),
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Cari produk...',
-                                  border: InputBorder.none,
-                                ),
-                                onSubmitted: (value) {
-                                  _loadProducts();
-                                },
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.search),
-                              onPressed: _loadProducts,
-                            ),
-                          ],
-                        ),
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(200),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withAlpha(100)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(10),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      const SizedBox(height: 24),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Icon(Icons.search, color: Colors.grey),
+                      ),
                       Expanded(
-                        child: FutureBuilder<List<Product>>(
-                          future: _productsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Center(child: Text('Tidak ada produk'));
-                            }
-
-                            final products = snapshot.data!;
-                            return GridView.builder(
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                mainAxisSpacing: 24,
-                                crossAxisSpacing: 24,
-                                childAspectRatio: 1.2,
-                              ),
-                              itemCount: products.length,
-                              itemBuilder: (context, index) {
-                                final product = products[index];
-                                return MenuItemCard(
-                                  name: product.name,
-                                  description: product.description ?? '',
-                                  price: _formatCurrency(product.price),
-                                  isAvailable: product.stock > 0,
-                                  onEdit: () => _showAddItemDialog(context),
-                                  onAvailabilityChanged: (val) {
-                                     // TODO: Implement update stock/availability via API
-                                  },
-                                );
-                              },
-                            );
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Cari produk...',
+                            border: InputBorder.none,
+                          ),
+                          onSubmitted: (value) {
+                            _loadProducts();
                           },
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: _loadProducts,
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                Expanded(
+                  child: FutureBuilder<List<Product>>(
+                    future: _productsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('Tidak ada produk'));
+                      }
+
+                      final products = snapshot.data!;
+                      return GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 24,
+                          crossAxisSpacing: 24,
+                          childAspectRatio: 0.75, // Taller card for premium look
+                        ),
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return MenuItemCard(
+                            name: product.name,
+                            description: product.description ?? '',
+                            price: _formatCurrency(product.price),
+                            imageUrl: product.image,
+                            isAvailable: product.stock > 0,
+                            onEdit: () => _showAddItemDialog(context),
+                            onAvailabilityChanged: (val) {
+                               // TODO: Implement update stock/availability via API
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildMobileCategoryChip(String title, bool isSelected) {
-    return ChoiceChip(
-      label: Text(title),
-      selected: isSelected,
-      onSelected: (bool selected) {},
-      selectedColor: AppColors.primary.withAlpha(51),
-      labelStyle: TextStyle(
-        color: isSelected ? AppColors.primary : Colors.grey[700],
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      backgroundColor: Colors.white,
-      side: BorderSide(
-        color: isSelected ? AppColors.primary : Colors.grey[300]!,
-      ),
-    );
-  }
-
-  Widget _buildCategoryItem(String label, IconData icon) {
-    final isSelected = _selectedCategory == label;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            _selectedCategory = label;
-          });
-        },
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withAlpha(51) : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? Colors.black87 : Colors.grey.shade600,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.black87 : Colors.grey.shade600,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

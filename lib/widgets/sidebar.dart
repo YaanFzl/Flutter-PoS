@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
@@ -13,91 +14,175 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 250, // sm:w-64
-      color: AppColors.surfaceLight,
-      child: Column(
-        children: [
-          const SizedBox(height: 24),
-          // Logo
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                const Icon(Icons.restaurant_menu, color: AppColors.primary, size: 32),
-                const SizedBox(width: 8),
-                const Text(
-                  'DineDash',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textLight,
-                  ),
-                ),
-              ],
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          width: 280,
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(150), // 0.6 opacity
+            border: Border(
+              right: BorderSide(
+                color: Colors.white.withAlpha(100),
+                width: 1,
+              ),
             ),
           ),
-          const SizedBox(height: 32),
-          // Navigation
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                NavItem(
-                  icon: Icons.grid_view,
-                  label: 'Semua Pesanan',
-                  count: 7,
-                  isActive: selectedIndex == 0,
-                  onTap: () => onDestinationSelected(0),
-                ),
-                const SizedBox(height: 12),
-                NavItem(
-                  icon: Icons.soup_kitchen,
-                  label: 'Dapur',
-                  count: 2,
-                  isActive: selectedIndex == 1,
-                  onTap: () => onDestinationSelected(1),
-                ),
-                const SizedBox(height: 12),
-                NavItem(
-                  icon: Icons.restaurant,
-                  label: 'Menu',
-                  count: 0,
-                  isActive: selectedIndex == 2,
-                  onTap: () => onDestinationSelected(2),
-                ),
-              ],
-            ),
-          ),
-          // Logout
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: InkWell(
-              onTap: () {},
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                height: 56,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
+              // Logo Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Row(
                   children: [
-                    const Icon(Icons.logout, color: AppColors.textLight),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF0EB545)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withAlpha(77),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.restaurant_menu, color: Colors.white, size: 24),
+                    ),
                     const SizedBox(width: 16),
                     const Text(
-                      'Keluar',
+                      'DineDash',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.textLight,
+                        letterSpacing: -0.5,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+              
+              const SizedBox(height: 50),
+              
+              // Navigation
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _buildSectionHeader('MENU UTAMA'),
+                    const SizedBox(height: 16),
+                    NavItem(
+                      icon: Icons.grid_view_rounded,
+                      label: 'Semua Pesanan',
+                      count: 7,
+                      isActive: selectedIndex == 0,
+                      onTap: () => onDestinationSelected(0),
+                    ),
+                    const SizedBox(height: 8),
+                    NavItem(
+                      icon: Icons.soup_kitchen_rounded,
+                      label: 'Dapur',
+                      count: 2,
+                      isActive: selectedIndex == 1,
+                      onTap: () => onDestinationSelected(1),
+                    ),
+                    const SizedBox(height: 8),
+                    NavItem(
+                      icon: Icons.restaurant_rounded,
+                      label: 'Menu',
+                      count: 0,
+                      isActive: selectedIndex == 2,
+                      onTap: () => onDestinationSelected(2),
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    _buildSectionHeader('LAINNYA'),
+                    const SizedBox(height: 16),
+                    NavItem(
+                      icon: Icons.settings_rounded,
+                      label: 'Pengaturan',
+                      count: 0,
+                      isActive: false,
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Logout Profile Section
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(128),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        backgroundColor: AppColors.textMutedLight,
+                        radius: 20,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Admin Kasir',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: AppColors.textLight,
+                              ),
+                            ),
+                            Text(
+                              'Online',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textMutedLight.withAlpha(150),
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
@@ -121,48 +206,65 @@ class NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isActive ? Colors.white : AppColors.textMutedLight,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        color: isActive ? AppColors.primary : Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: isActive
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withAlpha(77),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
                   color: isActive ? Colors.white : AppColors.textMutedLight,
-                  fontWeight: FontWeight.w500,
+                  size: 22,
                 ),
-              ),
-            ),
-            if (count > 0)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isActive ? Colors.white.withAlpha(51) : AppColors.primary.withAlpha(26),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  count.toString(),
-                  style: TextStyle(
-                    color: isActive ? Colors.white : AppColors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isActive ? Colors.white : AppColors.textMutedLight,
+                      fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
-              ),
-          ],
+                if (count > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isActive ? Colors.white.withAlpha(51) : AppColors.primary.withAlpha(26),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      count.toString(),
+                      style: TextStyle(
+                        color: isActive ? Colors.white : AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );

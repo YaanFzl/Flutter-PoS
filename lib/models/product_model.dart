@@ -28,12 +28,20 @@ class Product {
       return 0;
     }
 
+    String? imageLink;
+    if (json['images'] != null && (json['images'] as List).isNotEmpty) {
+      final firstImage = (json['images'] as List).first;
+      if (firstImage is Map && firstImage['imageLink'] != null) {
+        imageLink = firstImage['imageLink'];
+      }
+    }
+
     return Product(
       id: parseInt(json['id']),
       name: json['name'] ?? '',
       price: parseInt(json['price']),
       description: json['description'],
-      image: json['image'],
+      image: imageLink ?? json['image'], // Fallback to 'image' if 'images' array is missing/empty
       category: json['category'] ?? '',
       stock: parseInt(json['stock']),
       variants: (json['variants'] as List<dynamic>?)
