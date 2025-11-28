@@ -40,6 +40,11 @@ class ApiService {
     await prefs.setString('auth_token', token);
   }
 
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+  }
+
   // Future<String?> _getToken() async {
   //   final prefs = await SharedPreferences.getInstance();
   //   return prefs.getString('auth_token');
@@ -100,6 +105,21 @@ class ApiService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update transaction: ${response.body}');
+    }
+  }
+
+  Future<void> cancelTransaction(int id) async {
+    await updateTransaction(id, {'status': 'canceled'});
+  }
+
+  Future<void> deleteTransaction(int id) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/api/transactions/$id'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Failed to delete transaction: ${response.body}');
     }
   }
 }

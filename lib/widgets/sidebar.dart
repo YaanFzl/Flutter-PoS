@@ -5,11 +5,17 @@ import '../theme/app_colors.dart';
 class Sidebar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onDestinationSelected;
+  final int allOrdersCount;
+  final int kitchenOrdersCount;
+  final VoidCallback? onLogout;
 
   const Sidebar({
     super.key,
     required this.selectedIndex,
     required this.onDestinationSelected,
+    this.allOrdersCount = 0,
+    this.kitchenOrdersCount = 0,
+    this.onLogout,
   });
 
   @override
@@ -81,7 +87,7 @@ class Sidebar extends StatelessWidget {
                     NavItem(
                       icon: Icons.grid_view_rounded,
                       label: 'Semua Pesanan',
-                      count: 7,
+                      count: allOrdersCount,
                       isActive: selectedIndex == 0,
                       onTap: () => onDestinationSelected(0),
                     ),
@@ -89,7 +95,7 @@ class Sidebar extends StatelessWidget {
                     NavItem(
                       icon: Icons.soup_kitchen_rounded,
                       label: 'Dapur',
-                      count: 2,
+                      count: kitchenOrdersCount,
                       isActive: selectedIndex == 1,
                       onTap: () => onDestinationSelected(1),
                     ),
@@ -109,8 +115,8 @@ class Sidebar extends StatelessWidget {
                       icon: Icons.settings_rounded,
                       label: 'Pengaturan',
                       count: 0,
-                      isActive: false,
-                      onTap: () {},
+                      isActive: selectedIndex == 3,
+                      onTap: () => onDestinationSelected(3),
                     ),
                   ],
                 ),
@@ -157,9 +163,12 @@ class Sidebar extends StatelessWidget {
                           ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+                      Material(
+                        type: MaterialType.transparency,
+                        child: IconButton(
+                          onPressed: onLogout,
+                          icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+                        ),
                       ),
                     ],
                   ),

@@ -13,6 +13,7 @@ class OrderCard extends StatelessWidget {
   final String tax;
   final String total;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   const OrderCard({
     super.key,
@@ -23,6 +24,7 @@ class OrderCard extends StatelessWidget {
     required this.tax,
     required this.total,
     this.onTap,
+    this.onDelete,
   });
 
   @override
@@ -68,21 +70,36 @@ class OrderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha(26), // 0.1
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primary.withAlpha(77)), // 0.3
-                ),
-                child: const Text(
-                  'Baru',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  if (onDelete != null)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: IconButton(
+                        onPressed: onDelete,
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        tooltip: 'Batalkan Pesanan',
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withAlpha(26), // 0.1
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.primary.withAlpha(77)), // 0.3
+                    ),
+                    child: const Text(
+                      'Baru',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

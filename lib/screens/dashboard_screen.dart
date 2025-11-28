@@ -8,7 +8,12 @@ import 'package:intl/intl.dart';
 import 'order/create_order_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final Function(int)? onCountChanged;
+
+  const DashboardScreen({
+    super.key,
+    this.onCountChanged,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -41,6 +46,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return '${difference.inHours} jam lalu';
     } else {
       return '${difference.inDays} hari lalu';
+    }
+  }
+
+  Future<void> _cancelOrder(int id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Batalkan Pesanan?'),
+        content: const Text('Pesanan akan dihapus dari daftar aktif.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Tidak'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Ya, Batalkan'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _apiService.deleteTransaction(id);
+        if (mounted) {
+          setState(() {
+            _transactionsFuture = _apiService.getTransactions();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Pesanan berhasil dihapus')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal membatalkan pesanan: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -122,7 +168,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         return const Center(child: Text('Tidak ada pesanan'));
                       }
 
-                      final transactions = snapshot.data!;
+                      final transactions = snapshot.data!
+                          .where((t) => t.status != 'canceled')
+                          .toList();
+                      
+                      // Notify parent about count
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        widget.onCountChanged?.call(transactions.length);
+                      });
+                      
+                      if (transactions.isEmpty) {
+                        return const Center(child: Text('Tidak ada pesanan aktif'));
+                      }
+
                       return GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossAxisCount,
@@ -153,6 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                               );
                             },
+                            onDelete: () => _cancelOrder(transaction.id),
                           );
                         },
                       );

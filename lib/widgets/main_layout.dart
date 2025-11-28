@@ -7,12 +7,18 @@ class MainLayout extends StatefulWidget {
   final Widget child;
   final int selectedIndex;
   final Function(int) onDestinationSelected;
+  final int allOrdersCount;
+  final int kitchenOrdersCount;
+  final VoidCallback? onLogout;
 
   const MainLayout({
     super.key,
     required this.child,
     required this.selectedIndex,
     required this.onDestinationSelected,
+    this.allOrdersCount = 0,
+    this.kitchenOrdersCount = 0,
+    this.onLogout,
   });
 
   @override
@@ -54,6 +60,9 @@ class _MainLayoutState extends State<MainLayout> {
                     widget.onDestinationSelected(index);
                     Navigator.pop(context); // Close drawer
                   },
+                  allOrdersCount: widget.allOrdersCount,
+                  kitchenOrdersCount: widget.kitchenOrdersCount,
+                  onLogout: widget.onLogout,
                 ),
               ),
               body: widget.child,
@@ -67,6 +76,9 @@ class _MainLayoutState extends State<MainLayout> {
                   Sidebar(
                     selectedIndex: widget.selectedIndex,
                     onDestinationSelected: widget.onDestinationSelected,
+                    allOrdersCount: widget.allOrdersCount,
+                    kitchenOrdersCount: widget.kitchenOrdersCount,
+                    onLogout: widget.onLogout,
                   ),
                   Expanded(
                     child: widget.child,

@@ -150,7 +150,7 @@ class DeliveryOrderCard extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('Tolak'),
+                    child: const Text('Batal'),
                   ),
                 ),
                 const SizedBox(width: 12),

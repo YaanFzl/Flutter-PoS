@@ -9,7 +9,12 @@ import '../../services/api_service.dart';
 import '../../models/transaction_model.dart';
 
 class DeliveryIntegrationScreen extends StatefulWidget {
-  const DeliveryIntegrationScreen({super.key});
+  final Function(int)? onCountChanged;
+
+  const DeliveryIntegrationScreen({
+    super.key,
+    this.onCountChanged,
+  });
 
   @override
   State<DeliveryIntegrationScreen> createState() => _DeliveryIntegrationScreenState();
@@ -81,6 +86,45 @@ class _DeliveryIntegrationScreenState extends State<DeliveryIntegrationScreen> {
              duration: Duration(seconds: 2),
            ),
         );
+      }
+    }
+  }
+
+  Future<void> _cancelOrder(int id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Batalkan Pesanan?'),
+        content: const Text('Pesanan akan dihapus dari daftar aktif.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Tidak'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Ya, Batalkan'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    // Optimistic update
+    setState(() {
+      _transactions.removeWhere((t) => t.id == id);
+    });
+
+    try {
+      await _apiService.deleteTransaction(id);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menghapus pesanan: $e')),
+        );
+        _loadTransactions(); // Revert on error
       }
     }
   }
@@ -159,6 +203,11 @@ class _DeliveryIntegrationScreenState extends State<DeliveryIntegrationScreen> {
             t.status != 'preparing' && 
             t.status != 'ready'
           ).toList();
+          
+          // Notify parent about count (using newOrders count for kitchen badge)
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.onCountChanged?.call(newOrders.length);
+          });
           
           final preparingOrders = _transactions.where((t) => t.status == 'preparing').toList();
           final readyOrders = _transactions.where((t) => t.status == 'ready').toList();
@@ -252,7 +301,7 @@ class _DeliveryIntegrationScreenState extends State<DeliveryIntegrationScreen> {
     if (order.status == 'paid' || order.status == 'waiting_payment') {
       showActions = true;
       onAccept = () => _updateStatus(order.id, 'preparing');
-      onReject = () {}; // Implement reject logic if needed
+      onReject = () => _cancelOrder(order.id);
     } else if (order.status == 'preparing') {
       primaryActionLabel = 'Tandai Siap';
       primaryActionIcon = Icons.check_circle_outline;
