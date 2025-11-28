@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../models/transaction_model.dart';
 import '../../theme/app_colors.dart';
 import '../delivery/delivery_order_details_screen.dart';
 import 'widgets/order_summary_card.dart';
 
 class PaymentConfirmationScreen extends StatelessWidget {
-  const PaymentConfirmationScreen({super.key});
+  final Transaction transaction;
+
+  const PaymentConfirmationScreen({super.key, required this.transaction});
+
+  String _formatCurrency(int amount) {
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    return formatter.format(amount);
+  }
+
+  String _formatDate(String dateString) {
+    if (dateString.isEmpty) return '-';
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('dd MMM yyyy, HH:mm').format(date);
+    } catch (e) {
+      return dateString;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +78,11 @@ class PaymentConfirmationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 // Info Card
-                const OrderSummaryCard(
-                  amount: 'Rp 542.500',
-                  orderId: '#12045',
-                  date: '24 Okt 2023, 14:30',
-                  paymentMethod: 'QRIS',
+                OrderSummaryCard(
+                  amount: _formatCurrency(transaction.totalPrice),
+                  orderId: '#${transaction.id}',
+                  date: _formatDate(transaction.createdAt),
+                  paymentMethod: transaction.paymentMethod.toUpperCase(),
                   status: 'Lunas',
                 ),
                 const SizedBox(height: 16),
@@ -74,7 +93,7 @@ class PaymentConfirmationScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const DeliveryOrderDetailsScreen(),
+                        builder: (context) => DeliveryOrderDetailsScreen(transaction: transaction),
                       ),
                     );
                   },

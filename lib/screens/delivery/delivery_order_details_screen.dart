@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../models/transaction_model.dart';
 import 'widgets/customer_info_card.dart';
 import 'widgets/delivery_summary_card.dart';
 import 'widgets/order_items_card.dart';
 import 'widgets/special_requests_card.dart';
 
 class DeliveryOrderDetailsScreen extends StatelessWidget {
-  const DeliveryOrderDetailsScreen({super.key});
+  final Transaction? transaction;
+
+  const DeliveryOrderDetailsScreen({super.key, this.transaction});
+
+  String _formatCurrency(int amount) {
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    return formatter.format(amount);
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Use transaction data if available, otherwise fallback (or show error/loading)
+    // For now, if transaction is null, we might want to handle it gracefully or assume it's passed.
+    // But since this screen might be accessed from other places (like Kanban), we should handle it.
+    
+    final items = transaction?.items.map((item) => {
+      'name': '${item.quantity}x ${item.productName}',
+      'price': _formatCurrency(item.subtotal),
+      'details': item.variantName ?? '', // Assuming variantName holds details like "Pedas"
+    }).toList() ?? [];
+
+    final subtotal = transaction?.totalPrice ?? 0;
+    final tax = (subtotal * 0.1).round(); // Simplified tax
+    final total = subtotal + tax; // Simplified total logic
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA), // background-light
       appBar: AppBar(
@@ -20,9 +43,9 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
             // Logo placeholder
             Container(width: 32, height: 32, color: Colors.green),
             const SizedBox(width: 12),
-            const Text(
-              '#GRF-12095',
-              style: TextStyle(
+            Text(
+              transaction != null ? '#${transaction!.id}' : '#GRF-12095',
+              style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
@@ -62,50 +85,42 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
                       Column(
                         children: [
                           // Order Items Card
-                          const OrderItemsCard(
-                            items: [
-                              {'name': '2x Ramen Pedas', 'price': 'Rp 240.000', 'details': 'Tambah cabai, Tanpa telur'},
-                              {'name': '1x Gyoza (6 pcs)', 'price': 'Rp 80.000'},
-                              {'name': '1x Teh Hijau', 'price': 'Rp 30.000'},
-                            ],
+                          OrderItemsCard(
+                            items: items,
                           ),
                           const SizedBox(height: 24),
                           // Customer & Special Requests
-                          // On mobile, these might also need to stack if width is very small, 
-                          // but let's keep them side-by-side or wrap them.
-                          // For simplicity, let's stack them on very small screens or keep row if space permits.
-                          // Let's use a Wrap or Column for safety on mobile.
                           LayoutBuilder(
                             builder: (context, innerConstraints) {
                               if (innerConstraints.maxWidth < 600) {
                                 return Column(
-                                  children: const [
+                                  children: [
                                     CustomerInfoCard(
-                                      name: 'Jane Doe',
-                                      phone: '+1 (555) 123-4567',
-                                      address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
+                                      name: transaction?.customerName ?? 'Pelanggan',
+                                      phone: '+62 812-3456-7890', // Placeholder
+                                      address: transaction?.customerEmail ?? '-', // Using email as address placeholder for now
                                     ),
-                                    SizedBox(height: 24),
-                                    SpecialRequestsCard(
-                                      request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
+                                    const SizedBox(height: 24),
+                                    const SpecialRequestsCard(
+                                      request: '-', // Placeholder
                                     ),
                                   ],
                                 );
                               }
                               return Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Expanded(
                                     child: CustomerInfoCard(
-                                      name: 'Jane Doe',
-                                      phone: '+1 (555) 123-4567',
-                                      address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
+                                      name: transaction?.customerName ?? 'Pelanggan',
+                                      phone: '+62 812-3456-7890',
+                                      address: transaction?.customerEmail ?? '-',
                                     ),
                                   ),
-                                  SizedBox(width: 24),
-                                  Expanded(
+                                  const SizedBox(width: 24),
+                                  const Expanded(
                                     child: SpecialRequestsCard(
-                                      request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
+                                      request: '-',
                                     ),
                                   ),
                                 ],
@@ -114,11 +129,11 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 24),
                           // Totals Card
-                          const DeliverySummaryCard(
-                            subtotal: 'Rp 350.000',
-                            tax: 'Rp 45.000',
-                            deliveryFee: 'Rp 50.000',
-                            total: 'Rp 445.000',
+                          DeliverySummaryCard(
+                            subtotal: _formatCurrency(subtotal),
+                            tax: _formatCurrency(tax),
+                            deliveryFee: 'Rp 0', // Simplified
+                            total: _formatCurrency(total),
                           ),
                         ],
                       ),
@@ -328,40 +343,36 @@ class DeliveryOrderDetailsScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           // Order Items Card
-                          const OrderItemsCard(
-                            items: [
-                              {'name': '2x Ramen Pedas', 'price': 'Rp 240.000', 'details': 'Tambah cabai, Tanpa telur'},
-                              {'name': '1x Gyoza (6 pcs)', 'price': 'Rp 80.000'},
-                              {'name': '1x Teh Hijau', 'price': 'Rp 30.000'},
-                            ],
+                          OrderItemsCard(
+                            items: items,
                           ),
                           const SizedBox(height: 24),
                           // Customer & Special Requests
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Expanded(
                                 child: CustomerInfoCard(
-                                  name: 'Jane Doe',
-                                  phone: '+1 (555) 123-4567',
-                                  address: '123 Maple Street, Apt 4B,\nSpringfield, SP 67890',
+                                  name: transaction?.customerName ?? 'Pelanggan',
+                                  phone: '+62 812-3456-7890',
+                                  address: transaction?.customerEmail ?? '-',
                                 ),
                               ),
-                              SizedBox(width: 24),
-                              Expanded(
+                              const SizedBox(width: 24),
+                              const Expanded(
                                 child: SpecialRequestsCard(
-                                  request: '"Mohon sediakan serbet dan sumpit ekstra. Alergi ringan terhadap kacang, harap berhati-hati."',
+                                  request: '-',
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 24),
                           // Totals Card
-                          const DeliverySummaryCard(
-                            subtotal: 'Rp 350.000',
-                            tax: 'Rp 45.000',
-                            deliveryFee: 'Rp 50.000',
-                            total: 'Rp 445.000',
+                          DeliverySummaryCard(
+                            subtotal: _formatCurrency(subtotal),
+                            tax: _formatCurrency(tax),
+                            deliveryFee: 'Rp 0',
+                            total: _formatCurrency(total),
                           ),
                         ],
                       ),

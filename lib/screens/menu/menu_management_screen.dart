@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/menu_item_card.dart';
+import '../../services/api_service.dart';
+import '../../models/product_model.dart';
+import 'package:intl/intl.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -12,19 +15,30 @@ class MenuManagementScreen extends StatefulWidget {
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   String _selectedCategory = 'Pembuka';
   final TextEditingController _searchController = TextEditingController();
-  
-  // Sample state for menu items availability
-  final Map<String, bool> _itemAvailability = {
-    'Bruschetta': true,
-    'Spring Rolls': true,
-    'Sup Tomat': true,
-    'Salad Caesar': true,
-  };
+  final ApiService _apiService = ApiService();
+  late Future<List<Product>> _productsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  void _loadProducts() {
+    setState(() {
+      _productsFuture = _apiService.getProducts(search: _searchController.text);
+    });
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  String _formatCurrency(int amount) {
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    return formatter.format(amount);
   }
 
   @override
@@ -91,62 +105,42 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 const Divider(height: 1),
                 // Menu Grid
                 Expanded(
-                  child: GridView.count(
-                    crossAxisCount: gridCrossAxisCount,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: gridChildAspectRatio,
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      MenuItemCard(
-                        name: 'Bruschetta',
-                        description: 'Roti panggang dengan tomat, bawang putih, dan basil.',
-                        price: 'Rp 85.000',
-                        isAvailable: _itemAvailability['Bruschetta'] ?? true,
-                        onEdit: () => _showAddItemDialog(context),
-                        onAvailabilityChanged: (val) {
-                          setState(() {
-                            _itemAvailability['Bruschetta'] = val;
-                          });
+                  child: FutureBuilder<List<Product>>(
+                    future: _productsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('Tidak ada produk'));
+                      }
+
+                      final products = snapshot.data!;
+                      return GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: gridCrossAxisCount,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: gridChildAspectRatio,
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return MenuItemCard(
+                            name: product.name,
+                            description: product.description ?? '',
+                            price: _formatCurrency(product.price),
+                            isAvailable: product.stock > 0,
+                            onEdit: () => _showAddItemDialog(context),
+                            onAvailabilityChanged: (val) {
+                              // TODO: Implement update stock/availability via API
+                            },
+                          );
                         },
-                      ),
-                      MenuItemCard(
-                        name: 'Spring Rolls',
-                        description: 'Lumpia goreng dengan sayuran segar.',
-                        price: 'Rp 75.000',
-                        isAvailable: _itemAvailability['Spring Rolls'] ?? true,
-                        onEdit: () => _showAddItemDialog(context),
-                        onAvailabilityChanged: (val) {
-                          setState(() {
-                            _itemAvailability['Spring Rolls'] = val;
-                          });
-                        },
-                      ),
-                      MenuItemCard(
-                        name: 'Sup Tomat',
-                        description: 'Sup tomat segar dengan rempah Italia.',
-                        price: 'Rp 55.000',
-                        isAvailable: _itemAvailability['Sup Tomat'] ?? true,
-                        onEdit: () => _showAddItemDialog(context),
-                        onAvailabilityChanged: (val) {
-                          setState(() {
-                            _itemAvailability['Sup Tomat'] = val;
-                          });
-                        },
-                      ),
-                      MenuItemCard(
-                        name: 'Salad Caesar',
-                        description: 'Salad klasik dengan dressing Caesar.',
-                        price: 'Rp 95.000',
-                        isAvailable: _itemAvailability['Salad Caesar'] ?? true,
-                        onEdit: () => _showAddItemDialog(context),
-                        onAvailabilityChanged: (val) {
-                          setState(() {
-                            _itemAvailability['Salad Caesar'] = val;
-                          });
-                        },
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -201,74 +195,58 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                               child: TextField(
                                 controller: _searchController,
                                 decoration: const InputDecoration(
-                                  hintText: 'Cari pembuka...',
+                                  hintText: 'Cari produk...',
                                   border: InputBorder.none,
                                 ),
-                                onChanged: (value) {
-                                  setState(() {});
+                                onSubmitted: (value) {
+                                  _loadProducts();
                                 },
                               ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.search),
+                              onPressed: _loadProducts,
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
                       Expanded(
-                        child: GridView.count(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 24,
-                          crossAxisSpacing: 24,
-                          childAspectRatio: 1.2,
-                          children: [
-                            MenuItemCard(
-                              name: 'Bruschetta',
-                              description: 'Roti panggang dengan tomat, bawang putih, dan basil.',
-                              price: 'Rp 85.000',
-                              isAvailable: _itemAvailability['Bruschetta'] ?? true,
-                              onEdit: () => _showAddItemDialog(context),
-                              onAvailabilityChanged: (val) {
-                                setState(() {
-                                  _itemAvailability['Bruschetta'] = val;
-                                });
+                        child: FutureBuilder<List<Product>>(
+                          future: _productsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Center(child: Text('Tidak ada produk'));
+                            }
+
+                            final products = snapshot.data!;
+                            return GridView.builder(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 24,
+                                crossAxisSpacing: 24,
+                                childAspectRatio: 1.2,
+                              ),
+                              itemCount: products.length,
+                              itemBuilder: (context, index) {
+                                final product = products[index];
+                                return MenuItemCard(
+                                  name: product.name,
+                                  description: product.description ?? '',
+                                  price: _formatCurrency(product.price),
+                                  isAvailable: product.stock > 0,
+                                  onEdit: () => _showAddItemDialog(context),
+                                  onAvailabilityChanged: (val) {
+                                     // TODO: Implement update stock/availability via API
+                                  },
+                                );
                               },
-                            ),
-                            MenuItemCard(
-                              name: 'Spring Rolls',
-                              description: 'Lumpia goreng dengan sayuran segar.',
-                              price: 'Rp 75.000',
-                              isAvailable: _itemAvailability['Spring Rolls'] ?? true,
-                              onEdit: () => _showAddItemDialog(context),
-                              onAvailabilityChanged: (val) {
-                                setState(() {
-                                  _itemAvailability['Spring Rolls'] = val;
-                                });
-                              },
-                            ),
-                            MenuItemCard(
-                              name: 'Sup Tomat',
-                              description: 'Sup tomat segar dengan rempah Italia.',
-                              price: 'Rp 55.000',
-                              isAvailable: _itemAvailability['Sup Tomat'] ?? true,
-                              onEdit: () => _showAddItemDialog(context),
-                              onAvailabilityChanged: (val) {
-                                setState(() {
-                                  _itemAvailability['Sup Tomat'] = val;
-                                });
-                              },
-                            ),
-                            MenuItemCard(
-                              name: 'Salad Caesar',
-                              description: 'Salad klasik dengan dressing Caesar.',
-                              price: 'Rp 95.000',
-                              isAvailable: _itemAvailability['Salad Caesar'] ?? true,
-                              onEdit: () => _showAddItemDialog(context),
-                              onAvailabilityChanged: (val) {
-                                setState(() {
-                                  _itemAvailability['Salad Caesar'] = val;
-                                });
-                              },
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -387,7 +365,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       decoration: InputDecoration(
                         labelText: 'Kategori',
                         border: OutlineInputBorder(),
-                      ),
+                        ),
                     ),
                   ),
                 ],

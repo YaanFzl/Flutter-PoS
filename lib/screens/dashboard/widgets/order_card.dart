@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../../widgets/common/status_badge.dart';
-import '../../payment/payment_selection_screen.dart';
 
 /// Order card widget for dashboard
 /// Displays order details with items, totals, and action button
@@ -160,14 +159,7 @@ class OrderCard extends StatelessWidget {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PaymentSelectionScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: onTap,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textLight,

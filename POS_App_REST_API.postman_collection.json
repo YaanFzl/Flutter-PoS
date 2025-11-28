@@ -1,0 +1,960 @@
+{
+	"info": {
+		"_postman_id": "fbad05f0-39f2-416c-8893-ce82fba07a0f",
+		"name": "POS App REST API",
+		"description": "Complete REST API collection for POS App Backend.\n\nBase URL: http://localhost:3000\n\nEndpoints:\n- Authentication\n- Products\n- Transactions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login - Success",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@kasir.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Login user dan mendapatkan JWT token.\n\nCredentials:\n- Admin: admin@example.com / admin123\n- Kasir: budi@kasir.com / password123"
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Failed (Invalid Email Format)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"invalid-email\",\n    \"password\": \"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Test login dengan format email yang tidak valid. Akan mengembalikan validation error."
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Failed (Wrong Credentials)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"wrongpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Test login dengan password yang salah. Akan mengembalikan 401 Unauthorized."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints untuk authentication"
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "Mendapatkan daftar semua produk dengan pagination default (page=1, rowsPerPage=10)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products with Pagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?page=1&rowsPerPage=5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Halaman yang ingin ditampilkan"
+								},
+								{
+									"key": "rowsPerPage",
+									"value": "5",
+									"description": "Jumlah data per halaman"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar produk dengan pagination custom."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products with Search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?search=ayam",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ayam",
+									"description": "Pencarian berdasarkan nama produk (LIKE)"
+								}
+							]
+						},
+						"description": "Mencari produk berdasarkan nama. Search menggunakan LIKE operator (case-insensitive)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products with All Parameters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?page=1&rowsPerPage=10&search=kopi",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Halaman yang ingin ditampilkan"
+								},
+								{
+									"key": "rowsPerPage",
+									"value": "10",
+									"description": "Jumlah data per halaman"
+								},
+								{
+									"key": "search",
+									"value": "kopi",
+									"description": "Pencarian berdasarkan nama produk"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar produk dengan semua parameter (pagination + search)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by ID - Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1"
+							]
+						},
+						"description": "Mendapatkan detail produk berdasarkan ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by ID - Not Found",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/9999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"9999"
+							]
+						},
+						"description": "Test mendapatkan produk yang tidak ada. Akan mengembalikan 404 Not Found."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints untuk mengelola produk"
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get All Transactions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Mendapatkan daftar semua transaksi dengan pagination default."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transactions with Pagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions?page=1&rowsPerPage=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Halaman yang ingin ditampilkan"
+								},
+								{
+									"key": "rowsPerPage",
+									"value": "20",
+									"description": "Jumlah data per halaman"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar transaksi dengan pagination custom."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transactions - Status: Completed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions?status=completed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed",
+									"description": "Filter: completed, waiting_payment, canceled"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar transaksi dengan status 'completed'."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transactions - Status: Waiting Payment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions?status=waiting_payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "waiting_payment",
+									"description": "Filter: completed, waiting_payment, canceled"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar transaksi dengan status 'waiting_payment'."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transactions - Status: Canceled",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions?status=canceled",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "canceled",
+									"description": "Filter: completed, waiting_payment, canceled"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar transaksi dengan status 'canceled'."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transactions with All Parameters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions?page=1&rowsPerPage=15&status=completed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Halaman yang ingin ditampilkan"
+								},
+								{
+									"key": "rowsPerPage",
+									"value": "15",
+									"description": "Jumlah data per halaman"
+								},
+								{
+									"key": "status",
+									"value": "completed",
+									"description": "Filter status transaksi"
+								}
+							]
+						},
+						"description": "Mendapatkan daftar transaksi dengan semua parameter (pagination + filter status)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by ID - Success",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"1"
+							]
+						},
+						"description": "Mendapatkan detail transaksi berdasarkan ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by ID - Not Found",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transactions/9999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"9999"
+							]
+						},
+						"description": "Test mendapatkan transaksi yang tidak ada. Akan mengembalikan 404 Not Found."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction - Basic (Takeaway)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_cashier\": 1,\n    \"type\": \"bawa_pulang\",\n    \"payment_method\": \"cash\",\n    \"items\": [\n        {\n            \"id_product\": 1,\n            \"price\": 28000,\n            \"quantity\": 2\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Membuat transaksi bawa pulang (takeaway) dengan field minimal yang diperlukan."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction - Complete (Dine-in)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_cashier\": 1,\n    \"type\": \"makan_ditempat\",\n    \"table_number\": 5,\n    \"customer_name\": \"Jane Smith\",\n    \"customer_email\": \"jane@example.com\",\n    \"payment_method\": \"qris\",\n    \"status\": \"completed\",\n    \"items\": [\n        {\n            \"id_product\": 1,\n            \"price\": 28000,\n            \"quantity\": 2\n        },\n        {\n            \"id_product\": 23,\n            \"price\": 6000,\n            \"quantity\": 2\n        },\n        {\n            \"id_product_varian\": 3,\n            \"price\": 28000,\n            \"quantity\": 1\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Membuat transaksi makan di tempat (dine-in) dengan semua field lengkap termasuk varian produk."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction - With Product Varian",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_cashier\": 2,\n    \"type\": \"bawa_pulang\",\n    \"customer_name\": \"Bob\",\n    \"payment_method\": \"cash\",\n    \"items\": [\n        {\n            \"id_product_varian\": 6,\n            \"price\": 8000,\n            \"quantity\": 1\n        },\n        {\n            \"id_product_varian\": 11,\n            \"price\": 18000,\n            \"quantity\": 2\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Membuat transaksi dengan item yang menggunakan varian produk (kopi ukuran small, iced kopi susu)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction - Failed (Missing Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_cashier\": 1,\n    \"type\": \"makan_ditempat\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Test membuat transaksi tanpa field yang required (payment_method, items). Akan mengembalikan validation error."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction - Failed (Invalid Type)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_cashier\": 1,\n    \"type\": \"invalid_type\",\n    \"payment_method\": \"qris\",\n    \"items\": [\n        {\n            \"id_product\": 1,\n            \"price\": 25000,\n            \"quantity\": 2\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Test membuat transaksi dengan type yang tidak valid. Akan mengembalikan validation error dengan invalid_enum_value."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction - Failed (Empty Items)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_cashier\": 1,\n    \"type\": \"makan_ditempat\",\n    \"payment_method\": \"qris\",\n    \"items\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						},
+						"description": "Test membuat transaksi dengan items array kosong. Akan mengembalikan validation error (too_small)."
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Create Transactions - Success",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transactions\": [\n        {\n            \"id_cashier\": 1,\n            \"type\": \"makan_ditempat\",\n            \"table_number\": 5,\n            \"payment_method\": \"qris\",\n            \"status\": \"completed\",\n            \"items\": [\n                {\n                    \"id_product\": 1,\n                    \"price\": 28000,\n                    \"quantity\": 2\n                },\n                {\n                    \"id_product\": 23,\n                    \"price\": 6000,\n                    \"quantity\": 2\n                }\n            ]\n        },\n        {\n            \"id_cashier\": 2,\n            \"type\": \"bawa_pulang\",\n            \"customer_name\": \"Bob\",\n            \"payment_method\": \"cash\",\n            \"status\": \"completed\",\n            \"items\": [\n                {\n                    \"id_product\": 9,\n                    \"id_product_varian\": 1,\n                    \"price\": 28000,\n                    \"quantity\": 1\n                }\n            ]\n        },\n        {\n            \"id_cashier\": 1,\n            \"type\": \"makan_ditempat\",\n            \"table_number\": 3,\n            \"customer_name\": \"Charlie\",\n            \"payment_method\": \"qris\",\n            \"items\": [\n                {\n                    \"id_product\": 15,\n                    \"price\": 25000,\n                    \"quantity\": 2\n                }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"bulk"
+							]
+						},
+						"description": "Membuat multiple transaksi sekaligus (bulk insert). Operasi ini bersifat partial success."
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Create Transactions - Failed (Empty Array)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transactions\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"bulk"
+							]
+						},
+						"description": "Test bulk insert dengan array kosong. Akan mengembalikan validation error (too_small)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction - Status Only",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"1"
+							]
+						},
+						"description": "Update status transaksi saja."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction - Multiple Fields",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\",\n    \"table_number\": 7,\n    \"customer_name\": \"John Updated\",\n    \"customer_email\": \"john.updated@example.com\",\n    \"payment_method\": \"cash\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"1"
+							]
+						},
+						"description": "Update multiple fields transaksi sekaligus."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction - Clear Nullable Fields",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer_name\": null,\n    \"customer_email\": null,\n    \"table_number\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"1"
+							]
+						},
+						"description": "Menghapus nilai field nullable dengan set ke null."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction - Cancel",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"canceled\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"1"
+							]
+						},
+						"description": "Membatalkan transaksi dengan mengubah status ke 'canceled'."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction - Failed (Not Found)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/9999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"9999"
+							]
+						},
+						"description": "Test update transaksi yang tidak ada. Akan mengembalikan 404 Not Found."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction - Failed (Invalid Status)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"invalid_status\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transactions/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"transactions",
+								"1"
+							]
+						},
+						"description": "Test update dengan status yang tidak valid. Akan mengembalikan validation error."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints untuk mengelola transaksi"
+		}
+	]
+}

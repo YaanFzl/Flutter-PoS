@@ -52,6 +52,8 @@ class MenuItemCard extends StatelessWidget {
                     children: [
                       Text(
                         name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -60,6 +62,8 @@ class MenuItemCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         description,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 14,

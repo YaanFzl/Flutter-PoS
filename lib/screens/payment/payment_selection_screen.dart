@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import 'payment_confirmation_screen.dart';
 import 'widgets/payment_method_card.dart';
+import '../../models/transaction_model.dart';
+import '../../services/api_service.dart';
+import 'package:intl/intl.dart';
 
 class PaymentSelectionScreen extends StatefulWidget {
-  const PaymentSelectionScreen({super.key});
+  final Transaction transaction;
+
+  const PaymentSelectionScreen({super.key, required this.transaction});
 
   @override
   State<PaymentSelectionScreen> createState() => _PaymentSelectionScreenState();
@@ -12,6 +17,58 @@ class PaymentSelectionScreen extends StatefulWidget {
 
 class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   String _selectedMethod = 'QRIS'; // Default selected
+  final ApiService _apiService = ApiService();
+  bool _isLoading = false;
+
+  String _formatCurrency(int amount) {
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    return formatter.format(amount);
+  }
+
+  Future<void> _processPayment() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _apiService.updateTransaction(widget.transaction.id, {
+        'status': 'completed',
+        'payment_method': _selectedMethod.toLowerCase().replaceAll(' ', '_'),
+      });
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentConfirmationScreen(transaction: widget.transaction),
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pembayaran dikonfirmasi'),
+            backgroundColor: Color(0xFF13EC5B),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal memproses pembayaran: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +92,11 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                       hoverColor: Colors.black12,
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Pesanan #12345',
+                      'Pesanan #${widget.transaction.id}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textLight,
@@ -75,9 +132,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            const Text(
-                              'Rp 550.000',
-                              style: TextStyle(
+                            Text(
+                              _formatCurrency(widget.transaction.totalPrice),
+                              style: const TextStyle(
                                 fontSize: 56,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary,
@@ -170,24 +227,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                     width: double.infinity,
                     height: 60, // py-4 approx
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to Payment Confirmation
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PaymentConfirmationScreen(),
-                          ),
-                        );
-                        // Show success message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Pembayaran dikonfirmasi'),
-                            backgroundColor: Color(0xFF13EC5B),
-                            behavior: SnackBarBehavior.floating,
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
+                      onPressed: _isLoading ? null : _processPayment,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: AppColors.textLight,
@@ -196,13 +236,15 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Konfirmasi Pembayaran',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Konfirmasi Pembayaran',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                 ),
